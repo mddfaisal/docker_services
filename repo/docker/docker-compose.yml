@@ -1,0 +1,62 @@
+version: '3.7'
+
+services:
+  mongodb:
+    build: ./mongo
+    container_name: service_mongo
+    hostname: mongo
+    volumes:
+        - ./mongo/mongod.conf:/etc/mongod.conf
+        - ../data/mongodata/data/db/:/data/db/
+    env_file:
+        - .env
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+        MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+        - 27017:27017
+
+  pqsql:
+    container_name: service_postgres
+    build: ./postgres
+    volumes:
+      - ../data/postgres-data:/var/lib/postgresql/data
+      - ../../:/src/
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  mysql:
+    container_name: service_mysql
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ../data/mysql-data:/var/lib/mysql
+      - ../../:/src/
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+  rabbitmq:
+    container_name: service_rabbitmq
+    image: rabbitmq:3.7.5-management
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ../data/rabbitmq:/var/lib/rabbitmq/mnesia/rabbit@app-rabbitmq:cached
+    environment:
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: /
+
+  redis:
+    container_name: service_redis
+    build: ./redis
+    ports: 
+      - 6379:6379
