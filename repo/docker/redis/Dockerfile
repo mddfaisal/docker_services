@@ -1,4 +1,4 @@
-FROM redislabs/redisjson2:latest
+FROM redis:latest
 
 ADD bootsync.sh /var/lib/boot2docker
 
